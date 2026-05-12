@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CashWeather™ — Know Your Financial Forecast Before It Hits</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink: #0c0f0a;
+  --paper: #f5f0e8;
+  --paper2: #ede8dc;
+  --accent: #d4500a;
+  --accent2: #1a6b3c;
+  --muted: #8a8278;
+  --border: #d6cfc2;
+  --white: #fdfaf5;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'DM Mono', monospace;
+  overflow-x: hidden;
+}
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 18px 40px;
+  background: rgba(245,240,232,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.05em; color: var(--ink); }
+.nav-logo span { color: var(--accent); }
+.nav-links { display: flex; gap: 28px; align-items: center; }
+.nav-links a { font-size: 11px; text-decoration: none; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; transition: color 0.2s; }
+.nav-links a:hover { color: var(--ink); }
+.nav-cta { background: var(--ink); color: var(--paper) !important; padding: 9px 18px; border-radius: 4px; font-size: 11px !important; letter-spacing: 0.1em; }
+.nav-cta:hover { background: var(--accent) !important; color: var(--white) !important; }
+
+/* HERO */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 120px 40px 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-eyebrow {
+  font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 24px;
+  display: flex; align-items: center; gap: 10px;
+}
+.hero-eyebrow::before { content: ''; width: 32px; height: 1px; background: var(--accent); }
+
+.hero-headline {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(72px, 12vw, 160px);
+  line-height: 0.92;
+  letter-spacing: 0.01em;
+  max-width: 900px;
+  margin-bottom: 8px;
+}
+.hero-headline em {
+  font-style: normal;
+  color: var(--accent);
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+}
+
+.hero-sub-row {
+  display: flex; align-items: flex-end; gap: 48px;
+  margin-top: 40px;
+  flex-wrap: wrap;
+}
+.hero-sub {
+  font-size: 14px; line-height: 1.8; color: var(--muted);
+  max-width: 360px;
+}
+.hero-sub strong { color: var(--ink); font-weight: 500; }
+
+.hero-stats { display: flex; gap: 32px; }
+.stat { border-left: 2px solid var(--border); padding-left: 16px; }
+.stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: var(--ink); line-height: 1; }
+.stat-label { font-size: 10px; color: var(--muted); letter-spacing: 0.15em; text-transform: uppercase; margin-top: 4px; }
+
+/* Ticker tape */
+.ticker { 
+  background: var(--ink); color: var(--paper);
+  padding: 12px 0; overflow: hidden;
+  border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink);
+  white-space: nowrap;
+}
+.ticker-inner { display: inline-flex; animation: ticker 30s linear infinite; }
+.ticker-item { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; padding: 0 40px; }
+.ticker-item span { color: var(--accent); margin-right: 8px; }
+@keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+/* HOW IT WORKS */
+.section { padding: 100px 40px; }
+.section-label {
+  font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 48px;
+  display: flex; align-items: center; gap: 12px;
+}
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+.steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); }
+.step-block { background: var(--white); padding: 40px 32px; position: relative; }
+.step-num { font-family: 'Bebas Neue', sans-serif; font-size: 80px; color: var(--border); line-height: 1; margin-bottom: 16px; }
+.step-title { font-family: 'Instrument Serif', serif; font-size: 22px; font-style: italic; margin-bottom: 12px; color: var(--ink); }
+.step-desc { font-size: 12px; line-height: 1.8; color: var(--muted); }
+.step-icon { font-size: 28px; margin-bottom: 16px; }
+
+/* PROBLEM / SOLUTION */
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); margin: 0 40px; }
+.split-block { background: var(--white); padding: 48px 40px; }
+.split-block.dark { background: var(--ink); color: var(--paper); }
+.split-tag { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 20px; }
+.split-block .split-tag { color: var(--muted); }
+.split-block.dark .split-tag { color: var(--accent); }
+.split-headline { font-family: 'Instrument Serif', serif; font-size: 32px; font-style: italic; line-height: 1.3; margin-bottom: 20px; }
+.split-block.dark .split-headline { color: var(--paper); }
+.split-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.split-list li { font-size: 12px; line-height: 1.7; display: flex; gap: 10px; }
+.split-list li::before { content: '×'; color: var(--accent); flex-shrink: 0; font-weight: 700; }
+.split-block.dark .split-list li::before { content: '✓'; color: var(--accent2); }
+.split-block.dark .split-list li { color: #b0b8a8; }
+
+/* PRICING */
+.pricing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 760px; margin: 0 auto; }
+.price-card { border: 1px solid var(--border); border-radius: 4px; padding: 36px 32px; background: var(--white); position: relative; }
+.price-card.featured { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.price-tag-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+.price-card.featured .price-tag-label { color: var(--accent); }
+.price-name { font-family: 'Bebas Neue', sans-serif; font-size: 28px; margin-bottom: 8px; letter-spacing: 0.05em; }
+.price-amount { font-family: 'Bebas Neue', sans-serif; font-size: 56px; line-height: 1; margin-bottom: 4px; }
+.price-amount sup { font-size: 24px; vertical-align: top; margin-top: 10px; }
+.price-period { font-size: 11px; color: var(--muted); margin-bottom: 28px; }
+.price-card.featured .price-period { color: #7a8070; }
+.price-features { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+.price-features li { font-size: 12px; display: flex; gap: 8px; line-height: 1.5; }
+.price-features li::before { content: '—'; color: var(--muted); flex-shrink: 0; }
+.price-card.featured .price-features li { color: #b0b8a8; }
+.price-badge { position: absolute; top: -12px; right: 20px; background: var(--accent); color: white; font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; padding: 4px 10px; border-radius: 2px; }
+
+/* CTA SECTION */
+.cta-section {
+  background: var(--ink); color: var(--paper);
+  padding: 100px 40px;
+  text-align: center;
+}
+.cta-headline { font-family: 'Bebas Neue', sans-serif; font-size: clamp(48px, 8vw, 100px); line-height: 0.95; margin-bottom: 24px; }
+.cta-headline em { color: var(--accent); font-style: italic; font-family: 'Instrument Serif', serif; }
+.cta-sub { font-size: 13px; color: #7a8070; margin-bottom: 48px; max-width: 400px; margin-left: auto; margin-right: auto; line-height: 1.7; }
+
+/* FORM */
+.form-box { max-width: 500px; margin: 0 auto; }
+.input-row { display: flex; gap: 0; margin-bottom: 16px; }
+.input-row input {
+  flex: 1; padding: 15px 18px;
+  background: #1a1f17; border: 1px solid #2e3529;
+  border-right: none; border-radius: 4px 0 0 4px;
+  color: var(--paper); font-family: 'DM Mono', monospace; font-size: 13px;
+  outline: none; transition: border-color 0.2s;
+}
+.input-row input:focus { border-color: var(--accent); }
+.input-row input::placeholder { color: #4a5040; }
+.btn-submit {
+  padding: 15px 24px; background: var(--accent); color: white;
+  border: none; border-radius: 0 4px 4px 0;
+  font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 0.05em;
+  cursor: pointer; transition: background 0.2s; white-space: nowrap;
+}
+.btn-submit:hover { background: #b8420a; }
+
+.divider-text { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #4a5040; margin: 20px 0; display: flex; align-items: center; gap: 12px; }
+.divider-text::before, .divider-text::after { content: ''; flex: 1; height: 1px; background: #2e3529; }
+
+.btn-paid {
+  width: 100%; padding: 16px;
+  background: transparent; color: var(--paper);
+  border: 1px solid #3a4035; border-radius: 4px;
+  font-family: 'DM Mono', monospace; font-size: 13px;
+  cursor: pointer; transition: all 0.2s;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.btn-paid:hover { border-color: var(--accent2); color: var(--accent2); }
+.btn-paid-price { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--accent2); }
+
+/* Success state */
+.success-msg { display: none; text-align: center; padding: 24px; }
+.success-msg.show { display: block; }
+.form-box.submitted .input-row, .form-box.submitted .divider-text, .form-box.submitted .btn-paid { display: none; }
+.form-box.submitted .success-msg { display: block; }
+
+/* TESTIMONIALS placeholder */
+.quotes { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+.quote { background: var(--white); border: 1px solid var(--border); border-radius: 4px; padding: 28px 24px; }
+.quote-text { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 16px; line-height: 1.6; color: var(--ink); margin-bottom: 16px; }
+.quote-attr { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
+.quote-attr strong { color: var(--ink); display: block; font-style: normal; margin-bottom: 2px; font-family: 'DM Mono', monospace; }
+
+/* FOOTER */
+footer {
+  background: var(--ink); color: #4a5040;
+  padding: 40px; display: flex; justify-content: space-between; align-items: center;
+  font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+  border-top: 1px solid #2e3529;
+  flex-wrap: wrap; gap: 16px;
+}
+footer span { color: var(--accent); }
+
+/* ANIMATIONS */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+.fade-up { animation: fadeUp 0.7s ease both; }
+.fade-up-1 { animation-delay: 0.1s; }
+.fade-up-2 { animation-delay: 0.25s; }
+.fade-up-3 { animation-delay: 0.4s; }
+.fade-up-4 { animation-delay: 0.55s; }
+
+/* Floating weather widget */
+.weather-widget {
+  position: absolute; right: 60px; top: 50%; transform: translateY(-50%);
+  background: var(--white); border: 1px solid var(--border); border-radius: 12px;
+  padding: 24px 28px; min-width: 220px;
+  box-shadow: 0 20px 60px rgba(12,15,10,0.12);
+  animation: float 6s ease-in-out infinite;
+}
+@keyframes float { 0%,100% { transform: translateY(-50%); } 50% { transform: translateY(calc(-50% - 10px)); } }
+.widget-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+.widget-main { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.widget-icon { font-size: 36px; }
+.widget-status { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--accent2); }
+.widget-sub { font-size: 10px; color: var(--muted); }
+.widget-bars { display: flex; flex-direction: column; gap: 6px; }
+.widget-bar-row { display: flex; align-items: center; gap: 8px; }
+.widget-bar-label { font-size: 9px; color: var(--muted); width: 28px; }
+.widget-bar-track { flex: 1; height: 4px; background: var(--paper2); border-radius: 2px; overflow: hidden; }
+.widget-bar-fill { height: 100%; border-radius: 2px; }
+.widget-bar-val { font-size: 9px; color: var(--ink); width: 36px; text-align: right; }
+
+@media(max-width: 900px) { .weather-widget { display: none; } }
+@media(max-width: 700px) {
+  nav { padding: 16px 20px; }
+  .nav-links { display: none; }
+  .hero { padding: 100px 20px 60px; }
+  .section { padding: 60px 20px; }
+  .steps-grid { grid-template-columns: 1fr; }
+  .split { grid-template-columns: 1fr; margin: 0 20px; }
+  .pricing-grid { grid-template-columns: 1fr; }
+  .quotes { grid-template-columns: 1fr; }
+  .cta-section { padding: 60px 20px; }
+  footer { padding: 24px 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Cash<span>Weather</span>™</div>
+  <div class="nav-links">
+    <a href="#how">How It Works</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#cta" class="nav-cta">Get Early Access</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow fade-up">Financial Intelligence for Small Business</div>
+  <h1 class="hero-headline fade-up fade-up-1">
+    Know The<br/><em>Storm</em><br/>Before It Hits
+  </h1>
+
+  <div class="hero-sub-row fade-up fade-up-2">
+    <p class="hero-sub">
+      <strong>82% of small businesses fail due to cash flow problems.</strong> Not because they weren't profitable — because they didn't see it coming. CashWeather connects your accounts and tells you exactly what's ahead.
+    </p>
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num">30</div>
+        <div class="stat-label">Day Forecast</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">4</div>
+        <div class="stat-label">Integrations</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">AI</div>
+        <div class="stat-label">Powered</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating widget -->
+  <div class="weather-widget fade-up fade-up-3">
+    <div class="widget-label">Your Financial Weather · Live</div>
+    <div class="widget-main">
+      <div class="widget-icon">🌤️</div>
+      <div>
+        <div class="widget-status">Mostly Stable</div>
+        <div class="widget-sub">6 weeks runway · ↑ trending</div>
+      </div>
+    </div>
+    <div class="widget-bars">
+      <div class="widget-bar-row">
+        <span class="widget-bar-label">30d</span>
+        <div class="widget-bar-track"><div class="widget-bar-fill" style="width:78%;background:#1a6b3c"></div></div>
+        <span class="widget-bar-val">+$2.4k</span>
+      </div>
+      <div class="widget-bar-row">
+        <span class="widget-bar-label">60d</span>
+        <div class="widget-bar-track"><div class="widget-bar-fill" style="width:55%;background:#d4500a"></div></div>
+        <span class="widget-bar-val">+$890</span>
+      </div>
+      <div class="widget-bar-row">
+        <span class="widget-bar-label">90d</span>
+        <div class="widget-bar-track"><div class="widget-bar-fill" style="width:82%;background:#1a6b3c"></div></div>
+        <span class="widget-bar-val">+$5.1k</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <span class="ticker-item"><span>↑</span> QuickBooks Connected</span>
+    <span class="ticker-item"><span>☀️</span> Clear 30-Day Outlook</span>
+    <span class="ticker-item"><span>⚠</span> Invoice $3,200 Overdue</span>
+    <span class="ticker-item"><span>↑</span> Stripe Revenue Up 14%</span>
+    <span class="ticker-item"><span>🎯</span> Chase AR Before Month End</span>
+    <span class="ticker-item"><span>⛅</span> Payroll Due in 9 Days</span>
+    <span class="ticker-item"><span>↑</span> QuickBooks Connected</span>
+    <span class="ticker-item"><span>☀️</span> Clear 30-Day Outlook</span>
+    <span class="ticker-item"><span>⚠</span> Invoice $3,200 Overdue</span>
+    <span class="ticker-item"><span>↑</span> Stripe Revenue Up 14%</span>
+    <span class="ticker-item"><span>🎯</span> Chase AR Before Month End</span>
+    <span class="ticker-item"><span>⛅</span> Payroll Due in 9 Days</span>
+  </div>
+</div>
+
+<!-- PROBLEM / SOLUTION -->
+<div class="split" style="margin-top: 80px;">
+  <div class="split-block">
+    <div class="split-tag">The Problem</div>
+    <div class="split-headline">Running blind on your own money</div>
+    <ul class="split-list">
+      <li>You find out about a cash gap when it's already too late to act</li>
+      <li>Your data lives in 4 different apps that don't talk to each other</li>
+      <li>You're too busy running the business to run the numbers</li>
+      <li>Accountants are expensive and only look backward, not forward</li>
+    </ul>
+  </div>
+  <div class="split-block dark">
+    <div class="split-tag">The Fix</div>
+    <div class="split-headline">Your business's financial weather report</div>
+    <ul class="split-list">
+      <li>See cash gaps 30–90 days out — with time to act</li>
+      <li>QuickBooks, Stripe, Plaid & Gusto all in one place</li>
+      <li>AI does the analysis — you get a plain-English briefing</li>
+      <li>Proactive alerts before problems become crises</li>
+    </ul>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how">
+  <div class="section-label">How It Works</div>
+  <div class="steps-grid">
+    <div class="step-block">
+      <div class="step-num">01</div>
+      <div class="step-icon">🔗</div>
+      <div class="step-title">Connect your accounts</div>
+      <div class="step-desc">One-click OAuth with QuickBooks, Stripe, your bank via Plaid, and Gusto for payroll. No spreadsheets. No manual entry. Ever.</div>
+    </div>
+    <div class="step-block">
+      <div class="step-num">02</div>
+      <div class="step-icon">🧠</div>
+      <div class="step-title">AI reads the signals</div>
+      <div class="step-desc">Our AI cross-references all your data, spots patterns, and builds a 30/60/90-day cash flow model specific to your business.</div>
+    </div>
+    <div class="step-block">
+      <div class="step-num">03</div>
+      <div class="step-icon">☀️</div>
+      <div class="step-title">Get your forecast</div>
+      <div class="step-desc">Wake up to your financial weather report. Clear skies, incoming storm, or a gap you need to close — you'll know weeks before it hits.</div>
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAL PROOF -->
+<section class="section" style="padding-top: 0;">
+  <div class="section-label">Early Feedback</div>
+  <div class="quotes">
+    <div class="quote">
+      <div class="quote-text">"I had no idea I was 3 weeks away from not making payroll. CashWeather flagged it in time for me to collect on two overdue invoices."</div>
+      <div class="quote-attr"><strong>Maria T.</strong> Boutique Agency Owner, Austin TX</div>
+    </div>
+    <div class="quote">
+      <div class="quote-text">"It's like having a CFO in your pocket — but one that actually explains things in plain English instead of making you feel dumb."</div>
+      <div class="quote-attr"><strong>James K.</strong> Freelance Contractor, Chicago IL</div>
+    </div>
+    <div class="quote">
+      <div class="quote-text">"Our restaurant has wild seasonal swings. This is the first tool that actually accounts for that instead of just averaging it out."</div>
+      <div class="quote-attr"><strong>Sofia R.</strong> Restaurant Owner, Portland OR</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section" id="pricing">
+  <div class="section-label">Simple Pricing</div>
+  <div class="pricing-grid">
+    <div class="price-card">
+      <div class="price-tag-label">Free Tier</div>
+      <div class="price-name">Waitlist</div>
+      <div class="price-amount"><sup>$</sup>0</div>
+      <div class="price-period">Forever free · Limited spots</div>
+      <ul class="price-features">
+        <li>Manual data entry forecast</li>
+        <li>30-day AI cash flow analysis</li>
+        <li>Basic alerts & action plan</li>
+        <li>Priority access when we launch</li>
+      </ul>
+      <a href="#cta" style="display:block; text-align:center; padding:13px; border:1px solid var(--border); border-radius:4px; text-decoration:none; font-size:12px; color:var(--ink); letter-spacing:0.1em; text-transform:uppercase; transition:all 0.2s;" onmouseover="this.style.borderColor='var(--ink)'" onmouseout="this.style.borderColor='var(--border)'">Join Waitlist →</a>
+    </div>
+    <div class="price-card featured">
+      <div class="price-badge">Early Bird</div>
+      <div class="price-tag-label">Founder Access</div>
+      <div class="price-name">Pro</div>
+      <div class="price-amount"><sup>$</sup>29</div>
+      <div class="price-period">per month · Lock in forever</div>
+      <ul class="price-features">
+        <li>Live QuickBooks + Stripe sync</li>
+        <li>30/60/90-day AI forecasts</li>
+        <li>Daily push alerts & briefings</li>
+        <li>Plaid bank feed integration</li>
+        <li>Gusto payroll sync</li>
+        <li>Founder price locked for life</li>
+      </ul>
+      <a href="#cta" style="display:block; text-align:center; padding:13px; background:var(--accent); border-radius:4px; text-decoration:none; font-family:'Bebas Neue',sans-serif; font-size:16px; color:white; letter-spacing:0.05em; transition:background 0.2s;" onmouseover="this.style.background='#b8420a'" onmouseout="this.style.background='var(--accent)'">Get Founder Access →</a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="cta">
+  <h2 class="cta-headline">Stop Flying<br/><em>Blind.</em></h2>
+  <p class="cta-sub">Join 200+ small business owners getting early access. Free waitlist or lock in your founder rate today.</p>
+
+  <div class="form-box" id="formBox">
+    <div class="input-row">
+      <input type="email" id="emailInput" placeholder="your@email.com" />
+      <button class="btn-submit" onclick="joinWaitlist()">Join Free →</button>
+    </div>
+
+    <div class="divider-text">or</div>
+
+    <button class="btn-paid" onclick="getFounderAccess()">
+      <span>🔒 Lock in Founder Access — $29/mo forever</span>
+      <span class="btn-paid-price">$29</span>
+    </button>
+
+    <div class="success-msg" id="successMsg">
+      <div style="font-size:36px;margin-bottom:16px">🎉</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--paper);margin-bottom:8px;">You're on the list!</div>
+      <div style="font-size:12px;color:#7a8070;line-height:1.7;">We'll be in touch soon. In the meantime, share CashWeather with a fellow business owner who needs this.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>Cash<span>Weather</span>™ · 2026</div>
+  <div>AI-Powered Cash Flow Intelligence</div>
+  <div>Built with ♥ for small business</div>
+</footer>
+
+<script>
+function joinWaitlist() {
+  const email = document.getElementById('emailInput').value;
+  if (!email || !email.includes('@')) {
+    document.getElementById('emailInput').style.borderColor = '#d4500a';
+    return;
+  }
+  document.getElementById('formBox').classList.add('submitted');
+  document.getElementById('successMsg').classList.add('show');
+  // TODO: POST email to your backend / Mailchimp / Resend
+  console.log('Waitlist signup:', email);
+}
+
+function getFounderAccess() {
+  // TODO: redirect to Stripe checkout
+  alert('Stripe checkout coming soon! For now, email us at hello@cashweather.io to lock in your rate.');
+}
+
+document.getElementById('emailInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') joinWaitlist();
+  this.style.borderColor = '#2e3529';
+});
+
+// Simple scroll animation
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.style.opacity = 1; });
+}, { threshold: 0.1 });
+document.querySelectorAll('.step-block, .quote, .price-card, .split-block').forEach(el => {
+  el.style.opacity = 0;
+  el.style.transition = 'opacity 0.6s ease';
+  observer.observe(el);
+});
+</script>
+</body>
+</html>
