@@ -461,23 +461,27 @@ footer span { color: var(--accent); }
   <p class="cta-sub">Join 200+ small business owners getting early access. Free waitlist or lock in your founder rate today.</p>
 
   <div class="form-box" id="formBox">
-    <div class="input-row">
-      <input type="email" id="emailInput" placeholder="your@email.com" />
-      <button class="btn-submit" onclick="joinWaitlist()">Join Free →</button>
+    <div data-fs-success style="display:none;text-align:center;padding:24px;">
+      <div style="font-size:36px;margin-bottom:16px">🎉</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--paper);margin-bottom:8px;">You're on the list!</div>
+      <div style="font-size:12px;color:#7a8070;line-height:1.7;">We'll be in touch soon. In the meantime, share CashWeather with a fellow business owner who needs this.</div>
     </div>
 
-    <div class="divider-text">or</div>
+    <form id="my-form" style="display:none;">
+      <div class="input-row">
+        <input type="email" id="email" name="email" placeholder="your@email.com" data-fs-field required />
+        <button type="submit" class="btn-submit" data-fs-submit-btn>Join Free →</button>
+      </div>
+    </form>
+
+    <div data-fs-error style="display:none;color:#d4500a;text-align:center;margin-bottom:16px;font-size:12px;"></div>
+
+    <div class="divider-text" id="dividerText">or</div>
 
     <button class="btn-paid" onclick="getFounderAccess()">
       <span>🔒 Lock in Founder Access — $29/mo forever</span>
       <span class="btn-paid-price">$29</span>
     </button>
-
-    <div class="success-msg" id="successMsg">
-      <div style="font-size:36px;margin-bottom:16px">🎉</div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--paper);margin-bottom:8px;">You're on the list!</div>
-      <div style="font-size:12px;color:#7a8070;line-height:1.7;">We'll be in touch soon. In the meantime, share CashWeather with a fellow business owner who needs this.</div>
-    </div>
   </div>
 </section>
 
@@ -489,27 +493,18 @@ footer span { color: var(--accent); }
 </footer>
 
 <script>
-function joinWaitlist() {
-  const email = document.getElementById('emailInput').value;
-  if (!email || !email.includes('@')) {
-    document.getElementById('emailInput').style.borderColor = '#d4500a';
-    return;
-  }
-  document.getElementById('formBox').classList.add('submitted');
-  document.getElementById('successMsg').classList.add('show');
-  // TODO: POST email to your backend / Mailchimp / Resend
-  console.log('Waitlist signup:', email);
-}
+window.formspree = window.formspree || function () { (formspree.q = formspree.q || []).push(arguments); };
+formspree('initForm', { formElement: '#my-form', formId: 'xwvzkqge' });
+
+// Show form after Formspree loads
+setTimeout(() => {
+  document.getElementById('my-form').style.display = 'block';
+}, 100);
 
 function getFounderAccess() {
   // TODO: redirect to Stripe checkout
   alert('Stripe checkout coming soon! For now, email us at hello@cashweather.io to lock in your rate.');
 }
-
-document.getElementById('emailInput').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') joinWaitlist();
-  this.style.borderColor = '#2e3529';
-});
 
 // Simple scroll animation
 const observer = new IntersectionObserver((entries) => {
@@ -520,6 +515,8 @@ document.querySelectorAll('.step-block, .quote, .price-card, .split-block').forE
   el.style.transition = 'opacity 0.6s ease';
   observer.observe(el);
 });
+</script>
+<script src="https://unpkg.com/@formspree/ajax@1" defer></script>
 </script>
 </body>
 </html>
